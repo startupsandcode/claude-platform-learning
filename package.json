@@ -1,0 +1,31 @@
+{
+  "name": "claude-platform-learning",
+  "private": true,
+  "type": "module",
+  "description": "Hands-on lessons for the Claude platform: Messages SDK, Agent SDK, and more.",
+  "scripts": {
+    "typecheck": "tsc -p .",
+    "test": "node --test \"test/*.test.ts\"",
+    "reset": "node scripts/reset-workspace.ts",
+    "msg:01": "node --env-file=.env messages/01-basics.ts",
+    "msg:02": "node --env-file=.env messages/02-loop-limits.ts",
+    "msg:03": "node --env-file=.env messages/03-spend-cap.ts",
+    "msg:04": "node --env-file=.env messages/04-tool-allowlist.ts",
+    "msg:05": "node --env-file=.env messages/05-io-checks.ts",
+    "msg:06": "node --env-file=.env messages/06-approval.ts",
+    "agent:01": "node --env-file=.env agent/01-basics.ts",
+    "agent:02": "node --env-file=.env agent/02-turn-limits.ts",
+    "agent:03": "node --env-file=.env agent/03-spend-cap.ts",
+    "agent:04": "node --env-file=.env agent/04-tool-lists.ts",
+    "agent:05": "node --env-file=.env agent/05-hooks.ts",
+    "agent:06": "node --env-file=.env agent/06-approval-jail.ts"
+  },
+  "dependencies": {
+    "@anthropic-ai/claude-agent-sdk": "^0.3.326",
+    "@anthropic-ai/sdk": "^1.9.0"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.6",
+    "typescript": "^7.0.2"
+  }
+}
