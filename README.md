@@ -64,3 +64,12 @@ npm test                 # guard-logic unit tests
 npm run typecheck        # tsc over every lesson
 npm run reset            # recreate workspace/
 ```
+
+## Troubleshooting
+
+If `npm test` fails right after setup, check:
+
+- Node version: run `node --version`. You need Node 24 or newer, because the lessons run `.ts` files directly.
+- Dependencies: run `npm install` from the repo root and re-run `npm test`.
+- Directory: run commands from the repo root, where `package.json` lives.
+- Typecheck: `npm run typecheck` can point to a broken install or wrong Node version.
