@@ -64,3 +64,7 @@ npm test                 # guard-logic unit tests
 npm run typecheck        # tsc over every lesson
 npm run reset            # recreate workspace/
 ```
+
+## License
+
+[MIT](LICENSE)
