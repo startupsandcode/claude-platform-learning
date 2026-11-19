@@ -15,12 +15,20 @@
  * Guarded (npm run agent:05 -- --guarded): the PreToolUse hook denies curl, rm, parent-directory
  *   paths and .env writes. The denial is deterministic whether or not the model is fooled.
  *
+ * Hook-failure demo (the hook itself breaks, which is different from the hook saying no):
+ * Crashing, fails closed (npm run agent:05 -- --crash): the hook throws on every call and
+ *   onFailure: "block" blocks the tool call anyway.
+ * Crashing, fails open (npm run agent:05 -- --crash --fail-open): same crash, but onFailure
+ *   "continue" (the SDK default) only logs a warning and the tool call goes ahead.
+ *
  * NOT a security boundary: a denylist is easy to get around (other binaries, other spellings).
  * Prefer an allowlist of tools and real OS isolation for anything that matters.
  *
  * What you should see:
  *   - Step 1 (injected file): models usually notice the planted instruction and do not follow it, in both runs. That is the model resisting, not your hook.
  *   - Step 2 (you ask for curl directly): unguarded, the curl runs (exit 7, nothing listens on that port). Guarded, 'hook denied Bash: command blocked by guardrail' and the agent reports it was blocked.
+ *   - --crash: every tool call is blocked with "hook error ... failed; blocking because onFailure is \"block\"", the agent cannot read the file or run curl, and says so. Nothing ran.
+ *   - --crash --fail-open: the hook still crashes, but both tool calls go through (the curl runs, exit 7). A broken guard silently stops guarding.
  *   - Gotcha found while building this: on Windows the agent may call a PowerShell tool instead of Bash, so the guard covers both shell tools.
  */
 import { query } from "@anthropic-ai/claude-agent-sdk";
@@ -74,7 +82,9 @@ export function toHookOutput(decision: Decision): HookJSONOutput {
 async function main() {
   requireApiKey();
   resetWorkspace();
-  const guarded = process.argv.includes("--guarded");
+  const crash = process.argv.includes("--crash"); // demo: make the hook itself throw
+  const failOpen = process.argv.includes("--fail-open"); // demo: onFailure "continue" (the SDK default)
+  const guarded = process.argv.includes("--guarded") || crash;
   writeFileSync(
     join(WORKSPACE, "injected.txt"),
     [
@@ -108,12 +118,13 @@ async function main() {
                   hooks: [
                     async (input) => {
                       if (input.hook_event_name !== "PreToolUse") return {};
+                      if (crash) throw new Error("simulated hook bug");
                       const decision = preToolUseGuard(input);
                       if (!decision.allow) console.log(`hook denied ${input.tool_name}: ${decision.reason}`);
                       return toHookOutput(decision);
                     },
                   ],
-                  onFailure: "block" as const,
+                  onFailure: failOpen ? ("continue" as const) : ("block" as const),
                 },
               ],
             },
