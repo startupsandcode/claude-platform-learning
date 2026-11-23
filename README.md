@@ -21,6 +21,16 @@ npm test                    # unit tests for the guard logic, no API calls
 
 Needs Node 24 or newer (it runs the `.ts` files directly, no build step).
 
+## Verification before using an API key
+
+After `npm install`, run the deterministic tests first. They run locally and need no provider API key:
+
+```
+npm test
+```
+
+`npm test` makes no API calls and costs nothing. Live lesson commands (`npm run msg:NN`, `npm run agent:NN`) call the API with your key and can consume credits, so run them only after the tests pass.
+
 ## How a lesson works
 
 Every lesson is one file you can read top to bottom. Its header comment says what it teaches and what you should see.
